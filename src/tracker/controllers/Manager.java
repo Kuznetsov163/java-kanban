@@ -1,12 +1,24 @@
+package tracker.controllers;
+import tracker.model.Epic;
+import tracker.model.Status;
+import tracker.model.Subtask;
+import tracker.model.Task;
+
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.ArrayList;
 public class Manager {
     private Map<Integer, Task> tasks;
+    private Map<Integer, Subtask> subtasks;
+    private Map<Integer, Epic> epics;
     private int taskIdCounter;
+
+
     public Manager() {
         this.tasks = new HashMap<>();
+        this.subtasks = new HashMap<>();
+        this.epics = new HashMap<>();
         this.taskIdCounter = 1;
     }
     public Task addTask(Task newTask) {
@@ -29,21 +41,31 @@ public class Manager {
     public void deleteTaskById(int taskId) {
         tasks.remove(taskId);
     }
+
     public Task getTaskById(int taskId) {
         return tasks.get(taskId);
     }
-    public Map<Integer, Task> getAllTasks() {
-        return tasks;
+    public List<Task> getAllTasks() {
+        return new ArrayList<>(tasks.values());
     }
+
+    public List<Subtask> getSubtasks() {
+        return new ArrayList<>(subtasks.values());
+    }
+
+    public List<Epic> getEpics() {
+        return new ArrayList<>(epics.values());
+    }
+
     public void setStatusForSubtask(Subtask subtask, Status status) {
         subtask.setStatus(status);
     }
     public void updateEpicStatus(Epic epic) {
-        boolean allDone = epic.getSubtasks().values().stream().allMatch(subtask -> subtask.getStatus() == Status.DONE);
-        epic.setStatus(allDone ? Status.DONE : Status.IN_PROGRESS);
+        epic.updateStatus();
     }
+
     public List<Subtask> getAllSubtasksForEpic(Epic epic) {
-        List<Subtask> subtasksList = new ArrayList<>(epic.getSubtasks().values());
-        return subtasksList;
+        List<Subtask> subtasksList = new ArrayList<>(epic.getSubtasks());
+        return  subtasksList;
     }
 }

@@ -1,3 +1,9 @@
+import tracker.controllers.Manager;
+import tracker.model.Epic;
+import tracker.model.Status;
+import tracker.model.Subtask;
+import tracker.model.Task;
+
 public class Main {
 
     public static void main(String[] args) {
@@ -25,7 +31,7 @@ public class Main {
         taskManager.addSubtask(subtask3, epic2);
 
         System.out.println("Список задач:");
-        for (Task task : taskManager.getAllTasks().values()) {
+        for (Task task : taskManager.getAllTasks()) {
             System.out.println(task.getName());
         }
 
@@ -44,7 +50,7 @@ public class Main {
         taskManager.deleteTaskById(epic2.getId());
 
         System.out.println("Список задач после удаления:");
-        for (Task task : taskManager.getAllTasks().values()) {
+        for (Task task : taskManager.getAllTasks()) {
             System.out.println(task.getName());
         }
     }

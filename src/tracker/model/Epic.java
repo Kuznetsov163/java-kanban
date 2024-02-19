@@ -1,5 +1,10 @@
-import java.util.HashMap;
+package tracker.model;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
+
 
 public class Epic extends Task {
     private Map<Integer, Subtask> subtasks;
@@ -17,11 +22,17 @@ public class Epic extends Task {
         updateStatus();
     }
 
-    public Map<Integer, Subtask> getSubtasks() {
-        return subtasks;
+    public List<Subtask> getSubtasks() {
+        return new ArrayList<>(subtasks.values());
     }
-    private void updateStatus() {
-        boolean allDone = subtasks.values().stream().allMatch(subtask -> subtask.getStatus() == Status.DONE);
-        setStatus(allDone ? Status.DONE : Status.IN_PROGRESS);
+
+
+    public void updateStatus() {
+        if (subtasks.isEmpty()) {
+            setStatus(Status.NEW);
+        } else {
+            boolean allDone = subtasks.values().stream().allMatch(subtask -> subtask.getStatus() == Status.DONE);
+            setStatus(allDone ? Status.DONE : Status.IN_PROGRESS);
+        }
     }
 }

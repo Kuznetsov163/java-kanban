@@ -1,3 +1,5 @@
+package tracker.model;
+
 public class Task {
     private String name;
     private String description;
