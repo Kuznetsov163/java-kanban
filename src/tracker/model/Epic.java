@@ -30,6 +30,8 @@ public class Epic extends Task {
     public void updateStatus() {
         if (subtasks.isEmpty()) {
             setStatus(Status.NEW);
+        } else if (subtasks.values().stream().allMatch(subtask -> subtask.getStatus() == Status.NEW)) {
+            setStatus(Status.NEW);
         } else {
             boolean allDone = subtasks.values().stream().allMatch(subtask -> subtask.getStatus() == Status.DONE);
             setStatus(allDone ? Status.DONE : Status.IN_PROGRESS);

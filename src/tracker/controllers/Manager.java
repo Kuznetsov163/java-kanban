@@ -27,19 +27,46 @@ public class Manager {
         taskIdCounter++;
         return newTask;
     }
+    public Epic addEpic(Epic newEpic) {
+        newEpic.setId(taskIdCounter);
+        epics.put(newEpic.getId(), newEpic);
+        taskIdCounter++;
+        return newEpic;
+    }
     public Subtask addSubtask(Subtask newSubtask, Epic epic) {
         newSubtask.setId(taskIdCounter);
         epic.addSubtask(newSubtask);
-        tasks.put(taskIdCounter, newSubtask);
+        subtasks.put(taskIdCounter, newSubtask);
         taskIdCounter++;
         return newSubtask;
     }
+
     public Task updateTask(Task updatedTask) {
         tasks.put(updatedTask.getId(), updatedTask);
         return updatedTask;
     }
+    public Subtask updateSubtask(Subtask updatedSubtask) {
+        subtasks.put(updatedSubtask.getId(), updatedSubtask);
+        return updatedSubtask;
+    }
+    public Epic updateEpic(Epic updatedEpic) {
+        epics.put(updatedEpic.getId(), updatedEpic);
+        return updatedEpic;
+    }
     public void deleteTaskById(int taskId) {
         tasks.remove(taskId);
+    }
+    public void deleteEpicById(int epicId) {
+        epics.remove(epicId);
+    }
+    public void deleteSubtaskById(int subtaskId) {
+        subtasks.remove(subtaskId);
+    }
+    public Subtask getSubtaskById(int subtaskId) {
+        return subtasks.get(subtaskId);
+    }
+    public Epic getEpicById(int epicId) {
+        return epics.get(epicId);
     }
 
     public Task getTaskById(int taskId) {
@@ -68,4 +95,18 @@ public class Manager {
         List<Subtask> subtasksList = new ArrayList<>(epic.getSubtasks());
         return  subtasksList;
     }
+    public void deleteAllTasks() {
+        tasks.clear();
+    }
+    public void deleteAllEpics() {
+        epics.clear();
+    }
+    public void deleteAllSubtasks() {
+        subtasks.clear();
+    }
+
+
+
+
 }
+
