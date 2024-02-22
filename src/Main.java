@@ -49,8 +49,7 @@ public class Main {
 
         taskManager.setStatusForSubtask(subtask1, Status.DONE);
         taskManager.setStatusForSubtask(subtask2, Status.IN_PROGRESS);
-        taskManager.updateEpicStatus(epic1);
-        taskManager.updateEpicStatus(epic2);
+
 
 
         System.out.println("Статус задачи 1: " + task1.getStatus());
@@ -63,17 +62,37 @@ public class Main {
         System.out.println("Статус эпика 2 : " + epic2.getStatus());
         System.out.println("Статус подзадачи 1: " + subtask3.getStatus());
 
+
+        taskManager.updateEpicStatus(epic1);
+        taskManager.updateEpicStatus(epic2);
+
+
         taskManager.deleteTaskById(task1.getId());
+        taskManager.deleteEpicById(epic1.getId());
+
+        System.out.println("\n" + "Статус задачи 1: " + task1.getStatus() );
+        System.out.println("Статус задачи 2: " + task2.getStatus());
+
+        System.out.println("Статус эпика 1: " + epic1.getStatus());
+        System.out.println("Статус подзадачи 1 : " + subtask1.getStatus());
+        System.out.println("Статус подзадачи 2: " + subtask2.getStatus());
+
+        System.out.println("Статус эпика 2 : " + epic2.getStatus());
+        System.out.println("Статус подзадачи 1: " + subtask3.getStatus());
+
         System.out.println("Список задач после удаления:");
         for (Task task : taskManager.getAllTasks()) {
             System.out.println(task.getName());
         }
 
-
-        taskManager.deleteEpicById(epic1.getId());
         System.out.println("Список эпиков после удаления:");
         for (Epic epic : taskManager.getEpics()) {
             System.out.println(epic.getName());
         }
+
+        System.out.println("Список подзадач после удаления:");
+        for (Subtask subtask : taskManager.getSubtasks()) {
+            System.out.println(subtask.getName());
+        }
     }
-}
+    }
