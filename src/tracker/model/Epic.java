@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
-
+import java.util.Objects;
 
 public class Epic extends Task {
     private Map<Integer, Subtask> subtasks;
@@ -36,5 +36,17 @@ public class Epic extends Task {
             boolean allDone = subtasks.values().stream().allMatch(subtask -> subtask.getStatus() == Status.DONE);
             setStatus(allDone ? Status.DONE : Status.IN_PROGRESS);
         }
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Epic epic = (Epic) o;
+        return id == epic.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

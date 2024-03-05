@@ -1,4 +1,5 @@
 import tracker.controllers.Manager;
+import tracker.controllers.InMemoryManager;
 import tracker.model.Epic;
 import tracker.model.Status;
 import tracker.model.Subtask;
@@ -9,7 +10,7 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("Поехали!");
 
-        Manager taskManager = new Manager();
+        Manager taskManager = new InMemoryManager();
 
         Task task1 = new Task("Помыть посуду", "Вымыть всю посуду ", 1);
         Task task2 = new Task("Сходить в магазин", "Купить продукты для ужина", 2);
