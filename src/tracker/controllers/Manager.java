@@ -1,10 +1,8 @@
 package tracker.controllers;
+
 import tracker.model.Epic;
-import tracker.model.Status;
 import tracker.model.Subtask;
 import tracker.model.Task;
-
-
 
 import java.util.List;
     public interface Manager {
@@ -34,9 +32,7 @@ import java.util.List;
         List<Subtask> getSubtasks();
         List<Epic> getEpics();
 
-        // Методы для установки статуса подзадачи и обновления статуса эпика
-        void setStatusForSubtask(Subtask subtask, Status status);
-        void updateEpicStatus(Epic epic);
+
 
         // Методы для получения всех подзадач для эпика
         List<Subtask> getAllSubtasksForEpic(Epic epic);

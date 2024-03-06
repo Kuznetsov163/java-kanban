@@ -1,16 +1,20 @@
-import tracker.controllers.Manager;
+import tracker.controllers.HistoryManager;
+import tracker.controllers.InMemoryHistoryManager;
 import tracker.controllers.InMemoryManager;
+import tracker.controllers.Manager;
 import tracker.model.Epic;
-import tracker.model.Status;
 import tracker.model.Subtask;
 import tracker.model.Task;
-
 public class Main {
 
     public static void main(String[] args) {
         System.out.println("Поехали!");
 
-        Manager taskManager = new InMemoryManager();
+        HistoryManager historyManager = new InMemoryHistoryManager();
+        Manager taskManager = new InMemoryManager(historyManager);
+
+
+
 
         Task task1 = new Task("Помыть посуду", "Вымыть всю посуду ", 1);
         Task task2 = new Task("Сходить в магазин", "Купить продукты для ужина", 2);
@@ -48,8 +52,6 @@ public class Main {
         }
 
 
-        taskManager.setStatusForSubtask(subtask1, Status.DONE);
-        taskManager.setStatusForSubtask(subtask2, Status.IN_PROGRESS);
 
 
 
@@ -64,8 +66,6 @@ public class Main {
         System.out.println("Статус подзадачи 1: " + subtask3.getStatus());
 
 
-        taskManager.updateEpicStatus(epic1);
-        taskManager.updateEpicStatus(epic2);
 
 
         taskManager.deleteTaskById(task1.getId());

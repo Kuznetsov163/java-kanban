@@ -1,27 +1,27 @@
 package tracker.controllers;
+
 import tracker.model.Epic;
-import tracker.model.Status;
 import tracker.model.Subtask;
 import tracker.model.Task;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
-import java.util.ArrayList;
 public class InMemoryManager implements Manager {
     private Map<Integer, Task> tasks;
     private Map<Integer, Subtask> subtasks;
     private Map<Integer, Epic> epics;
     private int taskIdCounter;
-    private List<Task> history;
+    private HistoryManager historyManager;
 
 
-    public InMemoryManager() {
+    public InMemoryManager(HistoryManager historyManager) {
         this.tasks = new HashMap<>();
         this.subtasks = new HashMap<>();
         this.epics = new HashMap<>();
         this.taskIdCounter = 1;
-        this.history = new ArrayList<>();
+        this.historyManager = historyManager;
     }
     @Override
     public Task addTask(Task newTask) {
@@ -53,7 +53,10 @@ public class InMemoryManager implements Manager {
     @Override
     public Subtask updateSubtask(Subtask updatedSubtask) {
         subtasks.put(updatedSubtask.getId(), updatedSubtask);
+        Epic epic = updatedSubtask.getEpic();
+        epic.updateStatus();
         return updatedSubtask;
+
     }
     @Override
     public Epic updateEpic(Epic updatedEpic) {
@@ -89,25 +92,19 @@ public class InMemoryManager implements Manager {
     @Override
     public Subtask getSubtaskById(int subtaskId) {
         Subtask subtask = subtasks.get(subtaskId);
-        if (subtask != null) {
-            updateHistory(subtask.getEpic());
-        }
+
         return subtask;
     }
     @Override
     public Epic getEpicById(int epicId) {
         Epic epic = epics.get(epicId);
-        if (epic != null) {
-            updateHistory(epic);
-        }
+
         return epic;
     }
     @Override
     public Task getTaskById( int taskId) {
         Task task = tasks.get( taskId);
-        if (task != null) {
-            updateHistory(task);
-        }
+
         return task;
     }
     @Override
@@ -123,14 +120,7 @@ public class InMemoryManager implements Manager {
     public List<Epic> getEpics() {
         return new ArrayList<>(epics.values());
     }
-    @Override
-    public void setStatusForSubtask(Subtask subtask, Status status) {
-        subtask.setStatus(status);
-    }
-    @Override
-    public void updateEpicStatus(Epic epic) {
-        epic.updateStatus();
-    }
+
     @Override
     public List<Subtask> getAllSubtasksForEpic(Epic epic) {
         List<Subtask> subtasksList = new ArrayList<>(epic.getSubtasks());
@@ -160,17 +150,9 @@ public class InMemoryManager implements Manager {
     }
     @Override
     public List<Task> getHistory() {
-        int startIndex = Math.max(0, history.size() - 10);
-        return new ArrayList<>(history.subList(startIndex, history.size()));
-    }
-
-    private void updateHistory(Task task) {
-        if (task != null && !history.contains(task)) {
-            history.add(task);
-            if (history.size() > 10) {
-                history.remove(0);
-            }
-        }
+        List<Task> historyList = historyManager.getHistory();
+        int startIndex = Math.max(0, historyList.size() - 10);
+        return new ArrayList<>(historyList.subList(startIndex, historyList.size()));
     }
 }
 
