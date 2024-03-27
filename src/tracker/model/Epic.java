@@ -8,15 +8,18 @@ import java.util.Objects;
 
 public class Epic extends Task {
     private Map<Integer, Subtask> subtasks;
+
     public Epic(String name, String description, int id) {
         super(name, description, id);
         this.subtasks = new HashMap<>();
         this.setStatus(Status.NEW);
     }
+
     public void addSubtask(Subtask subtask) {
         subtasks.put(subtask.getId(), subtask);
         updateStatus();
     }
+
     public void removeSubtask(int subtaskId) {
         subtasks.remove(subtaskId);
         updateStatus();
@@ -25,7 +28,6 @@ public class Epic extends Task {
     public List<Subtask> getSubtasks() {
         return new ArrayList<>(subtasks.values());
     }
-
 
     public void updateStatus() {
         if (subtasks.isEmpty()) {
@@ -37,7 +39,8 @@ public class Epic extends Task {
             setStatus(allDone ? Status.DONE : Status.IN_PROGRESS);
         }
     }
-    @Override
+
+     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -49,4 +52,10 @@ public class Epic extends Task {
     public int hashCode() {
         return Objects.hash(id);
     }
+
+    @Override
+    public TaskType getType() {
+        return TaskType.EPIC;
+    }
+
 }
