@@ -52,4 +52,10 @@ public class Epic extends Task {
     public int hashCode() {
         return Objects.hash(id);
     }
+
+    @Override
+    public TaskType getType() {
+        return TaskType.EPIC;
+    }
+
 }

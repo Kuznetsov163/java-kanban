@@ -1,6 +1,7 @@
 package tracker.model;
 import java.util.Objects;
 
+
 public class Task {
     private String name;
     private String description;
@@ -13,6 +14,7 @@ public class Task {
         this.id = id;
         this.status = Status.NEW;
     }
+
 
     public String getName() {
         return name;
@@ -57,5 +59,9 @@ public class Task {
      @Override
      public int hashCode() {
         return Objects.hash(id);
+     }
+
+     public TaskType getType() { // использовал полиморфизм через переопределение
+        return TaskType.TASK;
      }
  }

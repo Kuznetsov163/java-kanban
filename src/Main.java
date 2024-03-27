@@ -69,7 +69,6 @@ public class Main {
         System.out.println("История после удаления задачи с id=1:");
         printHistory(historyManager);
 
-        // Удаляем эпик с тремя подзадачами
         historyManager.remove(22);
 
         System.out.println("История после удаления эпика с id=22:");
