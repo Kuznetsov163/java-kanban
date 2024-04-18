@@ -3,6 +3,7 @@
 package tracker.controllers;
 
 
+import tracker.exceptions.ManagerSaveException;
 import tracker.model.Status;
 import tracker.model.Epic;
 import tracker.model.Subtask;
@@ -27,14 +28,38 @@ public class FileBackedTasksManager extends InMemoryManager {
         this.file = file;
     }
 
-    public static FileBackedTasksManager loadFromFile(File file) throws IOException {
+    public static FileBackedTasksManager loadFromFile(File file)  {
         FileBackedTasksManager manager = new FileBackedTasksManager(new InMemoryHistoryManager(), file);
+        try {
+
+            manager.restoreFromFile();
+        } catch (ManagerSaveException e) {
+            throw new RuntimeException(e);
+        }
+        return manager;
+    }
+
+    private void restoreFromFile() throws ManagerSaveException {
+        int maxTaskId;
         try (BufferedReader reader = Files.newBufferedReader(file.toPath(), StandardCharsets.UTF_8)) {
+            reader.readLine(); // заголовок
             String line;
+
+            maxTaskId = 0;
             while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
+
+                if (line.equals(HEADER_CSV_FILE)) {
+
+                    continue;
+                }
+
                 try {
+
+                    String[] parts = line.split(",");
                     int id = Integer.parseInt(parts[0]);
+                    if (id > maxTaskId) {
+                        maxTaskId = id;
+                    }
                     String type = parts[1];
                     String name = parts[2];
                     Status status = Status.valueOf(parts[3].toUpperCase());
@@ -44,15 +69,15 @@ public class FileBackedTasksManager extends InMemoryManager {
                     if (TaskType.EPIC.toString().equals(type)) {
                         Epic epic = new Epic(name, description, id);
                         epic.setId(id);
-                        manager.addEpic(epic);
+                        addEpic(epic);
                     } else if (TaskType.SUBTASK.toString().equals(type)) {
-                        Subtask subtask = new Subtask(name, description, id, manager.getEpicById(epicId));
+                        Subtask subtask = new Subtask(name, description, id, getEpicById(epicId));
                         subtask.setId(id);
-                        manager.addSubtask(subtask, manager.getEpicById(epicId));
+                        addSubtask(subtask, getEpicById(epicId));
                     } else {
                         Task task = new Task(name, description, id);
                         task.setStatus(status);
-                        manager.addTask(task);
+                        addTask(task);
                     }
                 } catch (NumberFormatException e) {
                     System.out.println("Ошибка идентификатора в файле CSV: " + e.getMessage());
@@ -62,10 +87,10 @@ public class FileBackedTasksManager extends InMemoryManager {
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка чтения файла: " + e.getMessage(), e);
         }
-        return manager;
+        taskIdCounter = maxTaskId + 1;
     }
 
-    public void save() throws IOException {
+    public void save() {
         try (FileWriter writer = new FileWriter(file, StandardCharsets.UTF_8)) {
             writer.write(HEADER_CSV_FILE);
 
@@ -166,94 +191,61 @@ public class FileBackedTasksManager extends InMemoryManager {
      @Override
      public Task updateTask(Task updatedTask) {
         Task task = super.updateTask(updatedTask);
-        try {
-            save();
-        } catch (IOException e) {
-            throw new RuntimeException("Ошибка при сохранении в файл", e);
-        }
+        save();
+
         return task;
     }
 
      @Override
      public Epic updateEpic(Epic updatedEpic) {
         Epic epic = super.updateEpic(updatedEpic);
-        try {
-            save();
-        } catch (IOException e) {
-            throw new RuntimeException("Ошибка при сохранении в файл", e);
-        }
+        save();
+
         return epic;
     }
 
      @Override
      public Subtask updateSubtask(Subtask updatedSubtask) {
         Subtask subtask = super.updateSubtask(updatedSubtask);
-        try {
-            save();
-        } catch (IOException e) {
-            throw new RuntimeException("Ошибка при сохранении в файл", e);
-        }
+        save();
+
         return subtask;
     }
 
      @Override
      public void deleteTaskById(int taskId) {
         super.deleteTaskById(taskId);
-        try {
-            save();
-        } catch (IOException e) {
-            throw new RuntimeException("Ошибка при сохранении в файл", e);
-        }
+        save();
     }
 
      @Override
      public void deleteEpicById(int epicId) {
         super.deleteEpicById(epicId);
-        try {
-            save();
-        } catch (IOException e) {
-            throw new RuntimeException("Ошибка при сохранении в файл", e);
-        }
+        save();
     }
 
      @Override
      public void deleteSubtaskById(int subtaskId) {
         super.deleteSubtaskById(subtaskId);
-        try {
-            save();
-        } catch (IOException e) {
-            throw new RuntimeException("Ошибка при сохранении в файл", e);
-        }
+        save();
     }
 
      @Override
      public void deleteAllTasks() {
         super.deleteAllTasks();
-        try {
-            save();
-        } catch (IOException e) {
-            throw new RuntimeException("Ошибка при сохранении в файл", e);
-        }
+        save();
     }
 
      @Override
      public void deleteAllEpics() {
         super.deleteAllEpics();
-        try {
-            save();
-        } catch (IOException e) {
-            throw new RuntimeException("Ошибка при сохранении в файл", e);
-        }
+        save();
     }
 
      @Override
      public void deleteAllSubtasks() {
         super.deleteAllSubtasks();
-        try {
-            save();
-        } catch (IOException e) {
-            throw new RuntimeException("Ошибка при сохранении в файл", e);
-        }
+        save();
     }
 
 
@@ -263,12 +255,7 @@ public class FileBackedTasksManager extends InMemoryManager {
         newTask.setId(taskIdCounter);
         tasks.put(taskIdCounter, newTask);
         taskIdCounter++;
-
-        try {
-            save();
-        } catch (IOException e) {
-            throw new RuntimeException("Ошибка при сохранении в файл", e);
-        }
+        save();
 
         return newTask;
     }
@@ -278,12 +265,7 @@ public class FileBackedTasksManager extends InMemoryManager {
         newEpic.setId(taskIdCounter);
         epics.put(newEpic.getId(), newEpic);
         taskIdCounter++;
-
-        try {
-            save();
-        } catch (IOException e) {
-            throw new RuntimeException("Ошибка при сохранении в файл", e);
-        }
+        save();
 
         return newEpic;
     }
@@ -294,12 +276,7 @@ public class FileBackedTasksManager extends InMemoryManager {
         epic.addSubtask(newSubtask);
         subtasks.put(taskIdCounter, newSubtask);
         taskIdCounter++;
-
-        try {
-            save();
-        } catch (IOException e) {
-            throw new RuntimeException("Ошибка при сохранении в файл", e);
-        }
+        save();
 
         return newSubtask;
     }
