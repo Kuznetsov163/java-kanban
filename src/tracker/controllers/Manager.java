@@ -56,7 +56,7 @@ import java.util.List;
         void deleteAllSubtasks();
 
         // Метод история
-        List<Task> getHistory();
+        HistoryManager getHistory();
 
         void remove(int id);
     }

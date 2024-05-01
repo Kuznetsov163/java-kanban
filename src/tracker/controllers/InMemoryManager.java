@@ -11,11 +11,11 @@ import java.util.Map;
 
 public class InMemoryManager implements Manager  {
 
-    private Map<Integer, Task> tasks;
-    private Map<Integer, Subtask> subtasks;
-    private Map<Integer, Epic> epics;
-    private int taskIdCounter;
-    private HistoryManager historyManager;
+    protected Map<Integer, Task> tasks;
+    protected Map<Integer, Subtask> subtasks;
+    protected Map<Integer, Epic> epics;
+    protected int taskIdCounter;
+    protected HistoryManager historyManager;
 
 
     public InMemoryManager(HistoryManager historyManager) {
@@ -171,9 +171,9 @@ public class InMemoryManager implements Manager  {
     }
 
      @Override
-    public List<Task> getHistory() {
+    public HistoryManager getHistory() {
 
-        return historyManager.getHistory();
+        return (HistoryManager) historyManager.getHistory();
     }
 
      @Override
