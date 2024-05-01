@@ -5,8 +5,9 @@ import tracker.model.Subtask;
 import tracker.model.Task;
 
 import java.util.List;
+import java.util.Set;
 
-    public interface Manager {
+public interface Manager {
 
         // Методы для добавления задач, эпиков и подзадач
         Task addTask(Task newTask);
@@ -59,5 +60,8 @@ import java.util.List;
         HistoryManager getHistory();
 
         void remove(int id);
+
+        // Сортировка
+        Set<Task> getPrioritizedTasks();
     }
 
