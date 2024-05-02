@@ -22,6 +22,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class FileBackedTasksManager extends InMemoryManager {
     private final File file;
     private static final String HEADER_CSV_FILE = "id,type,name,status,description,startDate,duration,epicId\n";
@@ -151,7 +152,7 @@ public class FileBackedTasksManager extends InMemoryManager {
 
 
         if (TaskType.EPIC.toString().equals(type)) {
-            Epic epic = new Epic(id, name, description, status, startTime, duration);
+            Epic epic = new Epic(id, name, description, startTime, duration);
             epic.setId(id);
             epic.setStatus(status);
             return epic;
@@ -288,15 +289,22 @@ public class FileBackedTasksManager extends InMemoryManager {
     }
 
     @Override
-    public Subtask addSubtask(Subtask newSubtask, Epic epic) {
+    public Subtask addSubtask(Subtask newSubtask, Epic epic)   {
         newSubtask.setId(taskIdCounter);
         epic.addSubtask(newSubtask);
         subtasks.put(taskIdCounter, newSubtask);
         taskIdCounter++;
         prioritizedTasks.add(newSubtask);
+
+        try {
+            checkingTheIntersection();
+        } catch (Exception e) {
+            throw new RuntimeException("Подзадачи пересекаются по времени", e);
+        }
         newSubtask.setDuration(Duration.ofMinutes(newSubtask.getDuration().toMinutes()));
         newSubtask.setStartTime(newSubtask.getStartTime().orElse(LocalDateTime.now()));
         save();
+
 
         return newSubtask;
     }
@@ -333,4 +341,5 @@ public class FileBackedTasksManager extends InMemoryManager {
             throw new NullPointerException("Подзадача с id = " + subtaskId + " отсутвует");
         }
     }
+
 }

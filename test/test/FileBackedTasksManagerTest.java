@@ -1,10 +1,7 @@
 package test;
 
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import tracker.controllers.FileBackedTasksManager;
 import tracker.controllers.InMemoryHistoryManager;
 import tracker.model.Epic;
@@ -15,11 +12,11 @@ import tracker.model.Task;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -72,7 +69,7 @@ public class FileBackedTasksManagerTest {
 
     @Test
     void saveLoadEpicsAndSubtasks()  {
-        Epic epic = new Epic(1, "Epic 1", "Epic Description 1", Status.NEW, LocalDateTime.now(), Duration.ofMinutes(10));
+        Epic epic = new Epic(1, "Epic 1", "Epic Description 1",  LocalDateTime.now(), Duration.ofMinutes(10));
         Subtask subtask = new Subtask(2, "Subtask 1", "Description 1", Status.NEW, LocalDateTime.now(), Duration.ofMinutes(30), epic);
 
         manager.addEpic(epic);
@@ -156,5 +153,35 @@ public class FileBackedTasksManagerTest {
 
 
         assertDoesNotThrow(() -> manager.checkingTheIntersection());
+    }
+
+
+    // исправления теста
+    @DisplayName("Пересечения по времени, продолжительность")
+    @Test
+    public void testDuration() {
+        Epic epic = new Epic("Epic 1", "Epic Description", 1);
+        Subtask subtask1 = new Subtask(2, "Subtask 1", "Description 1", Status.NEW,
+                LocalDateTime.parse("2024-05-02T11:00"), Duration.ofMinutes(15), epic);
+        Subtask subtask2 = new Subtask(3, "Subtask 1", "Description 1", Status.NEW,
+                LocalDateTime.parse("2024-05-01T12:00"), Duration.ofMinutes(30), epic);
+        manager.addEpic(epic);
+        manager.addSubtask(subtask1, epic);
+        manager.addSubtask(subtask2, epic);
+
+        assertEquals(2,epic.getSubtasks().size(),"Должно быть 2 подзадачи");
+
+        assertEquals(subtask2.getStartTime(), epic.getStartTime(),
+                "Начало эпика - начало ранней подзадачи");
+        assertEquals(subtask1.getEndTime(), epic.getEndTime(),
+                "Завершение эпика - завершение последней подзадачи");
+        assertEquals(subtask1.getDuration().plus(subtask2.getDuration()),
+                epic.getDuration(),
+                "Длительности эпика - сумма длительностей подзадач");
+
+        Subtask subtask4 = new Subtask(4, "Subtask 1", "Description 1", Status.NEW,
+                LocalDateTime.parse("2024-05-02T11:00"), Duration.ofMinutes(30), epic);
+
+        Assertions.assertThrows(RuntimeException.class, () -> manager.addSubtask(subtask4, epic));
     }
 }

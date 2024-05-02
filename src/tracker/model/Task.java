@@ -86,7 +86,6 @@ public class Task {
     public Optional<LocalDateTime> getStartTime() {
         if (startTime == null) {
             setStartTime(LocalDateTime.MAX);
-            return Optional.ofNullable(startTime);
         }
         return Optional.ofNullable(startTime);
     }
@@ -98,7 +97,6 @@ public class Task {
     public Duration getDuration() {
         if (duration == null) {
             setDuration(Duration.ofMinutes(0));
-            return duration;
         }
         return duration;
     }

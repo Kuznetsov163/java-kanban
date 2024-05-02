@@ -16,16 +16,12 @@ public class Epic extends Task {
         this.setStatus(Status.NEW);
     }
 
-    public Epic(int id, String name, String description, LocalDateTime startTime, Duration duration) {
-        super(name, description,id);
-        this.startTime = startTime;
-        this.duration = duration != null ? duration : Duration.ofMinutes(0);
-        subtasks = new TreeMap<>();
-    }
 
-    public Epic(int id, String name, String description, Status status, LocalDateTime startTime, Duration duration) {
-        super(id, name, description, status, startTime, duration);
+    public Epic(int id, String name, String description, LocalDateTime startTime, Duration duration) {
+        super(id, name, description, Status.NEW,  startTime, duration);
         subtasks = new TreeMap<>();
+        this.duration = duration != null ? duration : Duration.ofMinutes(0);
+
     }
 
 
@@ -87,17 +83,18 @@ public class Epic extends Task {
         return endTime;
     }
 
+    @Override
     public Duration getDuration() {
-
-        if (subtasks == null) {
-            setDuration(Duration.ofMinutes(0));
-            return duration;
+        if (subtasks == null || subtasks.isEmpty()) {
+            return Duration.ZERO;
         }
-        if (!subtasks.isEmpty()) {
-            duration = Duration.ofMinutes(0);
 
+        Duration totalDuration = Duration.ZERO;
+        for (Subtask subtask : subtasks.values()) {
+            totalDuration = totalDuration.plus(subtask.getDuration());
         }
-        return duration;
+
+        return totalDuration;
     }
 
     @Override
@@ -110,6 +107,7 @@ public class Epic extends Task {
         this.startTime = startTime;
     }
 
+    @Override
     public Optional<LocalDateTime> getStartTime() {
         if (subtasks == null) {
             setStartTime(LocalDateTime.MAX);
