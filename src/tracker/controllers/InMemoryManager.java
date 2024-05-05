@@ -4,10 +4,12 @@ import tracker.model.Epic;
 import tracker.model.Subtask;
 import tracker.model.Task;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static java.util.Comparator.comparing;
 
 public class InMemoryManager implements Manager  {
 
@@ -17,6 +19,8 @@ public class InMemoryManager implements Manager  {
     protected int taskIdCounter;
     protected HistoryManager historyManager;
 
+    protected Set<Task> prioritizedTasks = new TreeSet<>(Comparator.comparing(task -> task.getStartTime()
+                    .orElse(null), Comparator.nullsLast(LocalDateTime::compareTo)));
 
     public InMemoryManager(HistoryManager historyManager) {
         this.tasks = new HashMap<>();
@@ -28,27 +32,59 @@ public class InMemoryManager implements Manager  {
 
     @Override
     public Task addTask(Task newTask) {
+        try {
+            if (newTask.getStartTime().isPresent()) {
+                checkingTheIntersection();
+            }
         newTask.setId(taskIdCounter);
         tasks.put(taskIdCounter, newTask);
         taskIdCounter++;
+        prioritizedTasks.add(newTask);
 
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        newTask.setDuration(Duration.ofMinutes(newTask.getDuration().toMinutes()));
+        newTask.setStartTime(newTask.getStartTime().orElse(LocalDateTime.now()));
         return newTask;
     }
 
     @Override
     public Epic addEpic(Epic newEpic) {
+        try {
+            if (newEpic.getStartTime().isPresent()) {
+                checkingTheIntersection();
+            }
         newEpic.setId(taskIdCounter);
         epics.put(newEpic.getId(), newEpic);
         taskIdCounter++;
+        prioritizedTasks.add(newEpic);
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        newEpic.setDuration(newEpic.getDuration());
+        newEpic.setStartTime(newEpic.getStartTime().orElse(LocalDateTime.now()));
+
         return newEpic;
     }
 
     @Override
     public Subtask addSubtask(Subtask newSubtask, Epic epic) {
+        try {
+            if (newSubtask.getStartTime().isPresent()) {
+                checkingTheIntersection();
+            }
         newSubtask.setId(taskIdCounter);
         epic.addSubtask(newSubtask);
         subtasks.put(taskIdCounter, newSubtask);
         taskIdCounter++;
+            prioritizedTasks.add(newSubtask);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        newSubtask.setDuration(Duration.ofMinutes(newSubtask.getDuration().toMinutes()));
+        newSubtask.setStartTime(newSubtask.getStartTime().orElse(LocalDateTime.now()));
 
         return newSubtask;
     }
@@ -179,6 +215,29 @@ public class InMemoryManager implements Manager  {
      @Override
     public void remove(int id) {
         historyManager.remove(id);
+    }
+
+    @Override
+    public Set<Task> getPrioritizedTasks() {
+        return prioritizedTasks;
+    }
+
+    // Метод для проверки пересечения времени выполнения задач
+    public void checkingTheIntersection() throws Exception {
+        List<Task> list = getPrioritizedTasks().stream()
+                .filter(task -> task.getStartTime().isPresent())
+                .sorted(comparing(task -> task.getStartTime().orElse(LocalDateTime.MIN)))
+                .collect(Collectors.toList());
+
+        for (int i = 1; i < list.size(); i++) {
+            LocalDateTime currentTaskEndTime = list.get(i - 1).getEndTime();
+            LocalDateTime nextTaskStartTime = list.get(i).getStartTime().orElse(LocalDateTime.MAX);
+
+            if (currentTaskEndTime.isAfter(nextTaskStartTime)) {
+                throw new Exception(list.get(i - 1).getName() + " " + currentTaskEndTime +
+                        " по времени выполнения пересекается с " + list.get(i).getName() + " " + nextTaskStartTime);
+            }
+        }
     }
 }
 

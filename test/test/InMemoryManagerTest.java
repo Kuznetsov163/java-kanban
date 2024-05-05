@@ -4,12 +4,16 @@ package test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tracker.model.Epic;
+import tracker.model.Status;
 import tracker.model.Subtask;
 import tracker.model.Task;
 import tracker.controllers.Manager;
 import tracker.controllers.HistoryManager;
 import tracker.controllers.InMemoryManager;
 import tracker.controllers.InMemoryHistoryManager;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -39,8 +43,8 @@ public class InMemoryManagerTest {
     @Test
     public void testSubtaskEqualityById() {
         Epic epic = new Epic("Epic 1", "Epic Description", 1);
-        Subtask subtask1 = new Subtask("Subtask 1", "Subtask Description 1", 1, epic);
-        Subtask subtask2 = new Subtask("Subtask 2", "Subtask Description 2", 1, epic);
+        Subtask subtask1 = new Subtask(1, "Subtask 1", "Description 1", Status.NEW, LocalDateTime.now(), Duration.ofMinutes(30),epic);
+        Subtask subtask2 = new Subtask(1, "Subtask 1", "Description 1", Status.NEW, LocalDateTime.now(), Duration.ofMinutes(30),epic);
         assertEquals(subtask1.getId(), subtask2.getId(), "Подзадачи с одинаковым идентификатором должны быть равными");
     }
 
@@ -49,7 +53,7 @@ public class InMemoryManagerTest {
     public void testAddEpicToItself() {
         Epic epic = new Epic("Epic 1", "Description", 1);
 
-        Subtask subtask = new Subtask("Subtask 1", "Description", 2, epic);
+        Subtask subtask = new Subtask(1, "Subtask 1", "Description 1", Status.NEW, LocalDateTime.now(), Duration.ofMinutes(30),epic);
         epic.addSubtask(subtask);
 
         assertFalse(epic.getSubtasks().contains(epic));
@@ -120,11 +124,45 @@ public class InMemoryManagerTest {
         assertEquals(originalTask, task);
     }
 
+    // обновление статусов
+    @Test
+    void testEpicStatusDone() {
+        Epic epic = new Epic("Epic 1", "Description 1", 1);
+        Subtask subtask = new Subtask("Subtask 1", "1", 1, epic);
+        subtask.setStatus(Status.DONE);
+        manager.addSubtask(subtask, epic);
+        manager.addEpic(epic);
+        assertEquals(Status.DONE, epic.getStatus());
+    }
+
+
+    @Test
+    void testEpicStatusInProgress() {
+        Epic epic = new Epic("Epic 1", "Description 1", 1);
+        Subtask subtask1 = new Subtask("Subtask 1", "Description 1", 1, epic);
+        Subtask subtask2 = new Subtask("Subtask 2", "Description 2", 2, epic);
+        subtask1.setStatus(Status.NEW);
+        subtask2.setStatus(Status.IN_PROGRESS);
+        manager.addSubtask(subtask1, epic);
+        manager.addSubtask(subtask2, epic);
+        manager.addEpic(epic);
+        assertEquals(Status.IN_PROGRESS, epic.getStatus());
+    }
+
+    @Test
+    void testEpicStatusNew() {
+        Epic epic = new Epic("Epic 1", "Description 1", 1);
+        manager.addEpic(epic);
+        assertEquals(Status.NEW, epic.getStatus());
+    }
+
+    // спринт 6
+
+
     //убедитесь, что задачи, добавляемые в HistoryManager, сохраняют предыдущую версию задачи и её данных.
     @Test
+
     public void testHistoryManager() {
-
-
 
         Task task = new Task("Task 1", "Description 1", 1);
         historyManager.add(task);
@@ -132,14 +170,15 @@ public class InMemoryManagerTest {
         List<Task> history = historyManager.getHistory();
         assertTrue(history.contains(task));
     }
-    // спринт 6
+
 
 
     // Удаляемые подзадачи не должны хранить внутри себя старые id.
     @Test
+
     public void testRemoveSubtaskFromEpic() {
         Epic epic = new Epic("Epic 1", "Description", 1);
-        Subtask subtask = new Subtask("Subtask 1", "Description", 2, epic);
+        Subtask subtask = new Subtask(2, "Subtask 1", "Description 1", Status.NEW, LocalDateTime.now(), Duration.ofMinutes(30),epic);
         epic.addSubtask(subtask);
 
         epic.removeSubtask(2);
@@ -150,7 +189,7 @@ public class InMemoryManagerTest {
     @Test
     public void testEpicSubtaskIdsAfterRemoval() {
         Epic epic = new Epic("Epic 1", "Description", 1);
-        Subtask subtask1 = new Subtask("Subtask 1", "Description", 2, epic);
+        Subtask subtask1 = new Subtask(2, "Subtask 1", "Description 1", Status.NEW, LocalDateTime.now(), Duration.ofMinutes(30),epic);
         epic.addSubtask(subtask1);
 
         epic.removeSubtask(2);
@@ -172,6 +211,7 @@ public class InMemoryManagerTest {
         assertEquals(retrievedTask.getName(), updatedTask.getName(), "Изменение поля задачи должно повлиять на данные менеджера.");
     }
 
+    // Проверяем, что изменение в оригинальной задаче не отразилось на задаче в менеджере
     @Test
     void testTaskSetterDoesNotAffectManagerData() {
         Task task = new Task("Task 1","g",1);
@@ -181,7 +221,6 @@ public class InMemoryManagerTest {
 
         task.setName("Updated Task 1");
 
-        // Проверяем, что изменение в оригинальной задаче не отразилось на задаче в менеджере
         assertNotEquals(originalTask.getName(), manager.getTaskById(task.getId()).getName());
         assertEquals("Task 1", originalTask.getName());
     }
@@ -205,12 +244,12 @@ public class InMemoryManagerTest {
         historyManager.remove(1);
         assertEquals(0, historyManager.getHistory().size());
     }
-    //  Проверяем, что после удаления эпика из истории размер истории  равен 0.
+    //  Проверяем, что после удаления эпика из истории размер истории равен 0.
 
     @Test
     public void testRemoveEpicFromHistory() {
         Epic epic = new Epic("epic", "Test Epic",2);
-        Subtask subtask = new Subtask("subtask", "Test Subtask",3,epic);
+        Subtask subtask = new Subtask(3, "Subtask 1", "Description 1", Status.NEW, LocalDateTime.now(), Duration.ofMinutes(30),epic);
         epic.addSubtask(subtask);
 
         historyManager.add(epic);
@@ -219,6 +258,15 @@ public class InMemoryManagerTest {
         historyManager.remove(2);
 
         assertEquals(0, historyManager.getHistory().size());
+    }
+
+    // дублирование
+    @Test
+    void testDuplicateAdd() {
+        Task task = new Task("Task 1", "Description 1", 1);
+        historyManager.add(task);
+        historyManager.add(task);
+        assertEquals(1, historyManager.getHistory().size());
     }
 
 }

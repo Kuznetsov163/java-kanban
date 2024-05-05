@@ -1,10 +1,17 @@
 package tracker.model;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Subtask extends Task {
 
     public Epic epic;
+
+    public Subtask(int id, String name, String description, Status status, LocalDateTime startTime, Duration duration, Epic epic) {
+        super(id, name, description,  status, startTime, duration);
+        this.epic = epic;
+    }
 
     public Subtask(String name, String description, int id, Epic epic) {
         super(name, description, id);
@@ -23,13 +30,14 @@ public class Subtask extends Task {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
         Subtask subtask = (Subtask) o;
-        return id == subtask.id;
+        return epic == subtask.epic;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(super.hashCode(), epic);
     }
 
     @Override

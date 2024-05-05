@@ -21,7 +21,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         this.tail = null;
     }
 
-    private static class Node {  // класс Node сделал внутренним
+    private static class Node {
         private Task task;
         private Node prev;
         private Node next;
@@ -111,7 +111,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     @Override
-    public void remove(int id) { // исправил внутреннюю структуру
+    public void remove(int id) {
         if (tasksMap.containsKey(id)) {
             Node nodeToRemove = tasksMap.get(id);
             Task taskToRemove = nodeToRemove.getTask();
@@ -135,7 +135,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
      @Override
-    public List<Task> getHistory() {  // полностью согласен с совместимостью метода getTasks
+    public List<Task> getHistory() {
          List<Task> result = new ArrayList<>();
          Node element = head;
          while (element != null) {
