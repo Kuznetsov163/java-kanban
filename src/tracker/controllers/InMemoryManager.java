@@ -206,10 +206,9 @@ public class InMemoryManager implements Manager  {
         subtasks.clear();
     }
 
-     @Override
-    public HistoryManager getHistory() {
-
-        return (HistoryManager) historyManager.getHistory();
+    @Override
+    public List<Task> getHistory() {
+        return historyManager.getHistory();
     }
 
      @Override
