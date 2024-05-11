@@ -4,6 +4,7 @@ package tracker.handlers;
 import com.google.gson.JsonParseException;
 import com.sun.net.httpserver.HttpExchange;
 import tracker.controllers.Manager;
+import tracker.exceptions.ManagerSaveException;
 import tracker.model.Epic;
 
 import java.io.IOException;
@@ -47,7 +48,7 @@ public class EpicHandler extends Handler {
             try {
                 writeResponse(exchange, gson.toJson(manager.getEpics()), 200);
             } catch (RuntimeException | IOException exp) {
-                System.out.println(exp.getMessage());
+                throw new ManagerSaveException("Ошибка при получении эпиков ", exp);
             }
         } else {
             String[] query = exchange.getRequestURI().getQuery().split("=");
@@ -75,8 +76,7 @@ public class EpicHandler extends Handler {
                 writeResponse(exchange, "Эпик " + epic.getId() + " обновлен.\n" + body, 200);
             }
         } catch (RuntimeException | IOException exp) {
-            System.out.println(exp.getMessage());
-            exp.printStackTrace();
+            throw new ManagerSaveException("Произошла ошибка при сохранении данных", exp);
         }
     }
 

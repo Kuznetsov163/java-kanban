@@ -24,10 +24,6 @@ public class HttpTaskManager extends FileBackedTasksManager {
         client = new KVTaskClient(url);
     }
 
-  /*  public HttpTaskManager(HistoryManager historyManager, File file,String url) {
-        super(historyManager, file);
-        client = new KVTaskClient(url);
-    }*/
 
     public void load() {
         client.load("tasks");

@@ -3,6 +3,7 @@ package tracker.handlers;
 import com.google.gson.JsonParseException;
 import com.sun.net.httpserver.HttpExchange;
 import tracker.controllers.Manager;
+import tracker.exceptions.ManagerSaveException;
 import tracker.model.Subtask;
 
 import java.io.IOException;
@@ -48,7 +49,7 @@ public class SubtaskHandler extends Handler {
             try {
                 writeResponse(exchange, gson.toJson(manager.getSubtasks()), 200);
             } catch (RuntimeException | IOException exp) {
-                System.out.println(exp.getMessage());
+                throw new ManagerSaveException("Ошибка при получении подзадач ", exp);
             }
         } else {
             String[] query = exchange.getRequestURI().getQuery().split("=");
@@ -76,10 +77,10 @@ public class SubtaskHandler extends Handler {
                 writeResponse(exchange, "Подзадача " + subtask.getId() + " обновлена.\n" + body, 200);
             }
         } catch (RuntimeException | IOException exp) {
-            System.out.println(exp.getMessage());
-            exp.printStackTrace();
+            throw new ManagerSaveException("Произошла ошибка при сохранении данных", exp);
         }
     }
+
 
     @Override
 
