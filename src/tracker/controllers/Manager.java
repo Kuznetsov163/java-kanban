@@ -57,7 +57,7 @@ public interface Manager {
         void deleteAllSubtasks();
 
         // Метод история
-        HistoryManager getHistory();
+        List<Task> getHistory();
 
         void remove(int id);
 
