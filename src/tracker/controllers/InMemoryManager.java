@@ -3,12 +3,10 @@ package tracker.controllers;
 import tracker.model.Epic;
 import tracker.model.Subtask;
 import tracker.model.Task;
-
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-
 import static java.util.Comparator.comparing;
 
 public class InMemoryManager implements Manager  {

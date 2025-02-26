@@ -6,7 +6,6 @@ import com.google.gson.GsonBuilder;
 import tracker.adapters.DurationAdapter;
 import tracker.adapters.LocalDateTimeAdapter;
 import tracker.server.KVTaskClient;
-
 import java.time.Duration;
 import java.time.LocalDateTime;
 

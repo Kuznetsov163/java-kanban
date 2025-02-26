@@ -2,7 +2,6 @@ package tracker.server;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;

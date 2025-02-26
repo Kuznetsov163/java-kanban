@@ -6,7 +6,6 @@ import com.sun.net.httpserver.HttpExchange;
 import tracker.controllers.Manager;
 import tracker.exceptions.ManagerSaveException;
 import tracker.model.Epic;
-
 import java.io.IOException;
 
 public class EpicHandler extends Handler {

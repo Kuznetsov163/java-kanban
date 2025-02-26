@@ -5,7 +5,6 @@ import com.sun.net.httpserver.HttpExchange;
 import tracker.controllers.Manager;
 import tracker.exceptions.ManagerSaveException;
 import tracker.model.Task;
-
 import java.io.IOException;
 
 public class TaskHandler extends Handler {

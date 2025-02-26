@@ -6,7 +6,6 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import tracker.adapters.DurationAdapter;
 import tracker.adapters.LocalDateTimeAdapter;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;

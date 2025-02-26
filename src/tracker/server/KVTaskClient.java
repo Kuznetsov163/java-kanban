@@ -1,7 +1,6 @@
 package tracker.server;
 
 import tracker.exceptions.ManagerSaveException;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
